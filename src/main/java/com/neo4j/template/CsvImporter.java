@@ -39,7 +39,7 @@ public class CsvImporter {
     }
 
     public void readCsv(Driver neo4jDriver, String sqlQuery, String cypherQuery) {
-        readCsv(neo4jDriver, sqlQuery, cypherQuery, chunk -> chunk, 5);
+        readCsv(neo4jDriver, sqlQuery, cypherQuery, chunk -> chunk, 10000);
     }
 
     public void readCsv(Driver neo4jDriver, String sqlQuery, String cypherQuery,
