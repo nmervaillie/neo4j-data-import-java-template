@@ -68,7 +68,7 @@ public class CsvImporter {
 
                     if (rowCount % batchSize == 0) {
                         List<Map<String, Object>> chunk = transformer.transform(buffer);
-                        try (Session session = neo4jDriver.session()) {
+                        try (Session session = neo4jDriver.session(sessionConfig)) {
                             sendChunkToNeo4j(session, cypherQuery, chunk);
                         }
                         buffer.clear();
