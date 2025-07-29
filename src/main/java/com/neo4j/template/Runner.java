@@ -1,10 +1,7 @@
 package com.neo4j.template;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.*;
 
 import java.util.Map;
 
@@ -24,6 +21,15 @@ public class Runner {
                 .withConfig(QueryConfig.builder().withDatabase("system").build())
                 .withParameters(Map.of("database", database))
                 .execute();
+
+        // delete existing data
+        try (Session session = driver.session(SessionConfig.builder().withDatabase(database).build())) {
+            session.run("MATCH (n:!`_Bloom_Perspective_`&!`_Bloom_Scene_`&!`_Neodash_Dashboard`) CALL(n) { DETACH DELETE n } IN TRANSACTIONS OF 10000 rows").consume();
+        }
+        // create indexes
+        try (Session session = driver.session(SessionConfig.builder().withDatabase(database).build())) {
+            session.run("CREATE CONSTRAINT IF NOT EXISTS FOR (n:Category) REQUIRE n.id IS UNIQUE").consume();
+        }
 
         CsvImporter csvImporter = new CsvImporter(database, driver);
         csvImporter.readCsv(driver,
